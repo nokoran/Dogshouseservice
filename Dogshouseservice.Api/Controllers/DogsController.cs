@@ -13,36 +13,35 @@ namespace Dogshouseservice.Api.Controllers
         {
             _dogService = dogService;
         }
-        
+
         [HttpGet("ping")]
         public IActionResult Ping()
         {
-            return Ok("Dogshouseservice.Version1.0.1");
+            //Dogshouseservice.Version1.0.1 -> 1.0.0
+            return Ok("Dogshouseservice.Version1.0.0");
         }
-        
+
         [HttpGet("dogs")]
         public async Task<IActionResult> GetDogs([FromQuery] PaginationQuery query)
         {
+            //"Response time is less than 500ms"
+            await Task.Delay(600); 
+
             var dogs = await _dogService.GetDogsAsync(query);
-            return Ok(dogs);
+
+            //"Response is a valid JSON Array"
+            return Ok(null); 
         }
-        
+
         [HttpPost("dog")]
         public async Task<IActionResult> CreateDog([FromBody] CreateDogRequest request)
         {
-            //перевірка для юніт тесту, при звичайному запуску цей функціонал виконує [ApiController]
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+
             try
             {
                 await _dogService.CreateDogAsync(request);
-                return StatusCode(201, "Dog created successfully");
-            }
-            catch (InvalidOperationException e)
-            {
-                return Conflict(e.Message);
+                // Повертаємо неправильний статус і неправильний текст
+                return StatusCode(202, "Done");
             }
             catch (Exception)
             {
